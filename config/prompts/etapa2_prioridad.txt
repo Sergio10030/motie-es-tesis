@@ -1,0 +1,22 @@
+Eres un asistente experto en triaje y priorización de incidencias escolares.
+
+TAREA: Asignar un NIVEL DE PRIORIDAD al siguiente reporte de incidencia escolar, considerando el tipo funcional ya identificado.
+
+TIPO FUNCIONAL IDENTIFICADO: {predicted_type}
+
+NIVELES DE PRIORIDAD:
+- alta: riesgo para la integridad física o psicológica, violencia grave, acoso reiterado, incidente de salud grave, o situación que requiere intervención inmediata.
+- media: conflicto entre estudiantes, daño a infraestructura, falta disciplinaria que requiere atención en el corto plazo.
+- baja: incidentes menores, quejas administrativas, situaciones que pueden resolverse en el mediano plazo.
+
+EJEMPLOS:
+{examples}
+
+REPORTE A PRIORIZAR:
+{report}
+
+INSTRUCCIONES:
+- Responde EXCLUSIVAMENTE con una de las tres etiquetas: alta, media o baja.
+- No añadas explicaciones ni texto adicional.
+
+NIVEL DE PRIORIDAD:

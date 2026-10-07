@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Evaluador | MOTIE-ES</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <header class="app-header">
+    <h1>MOTIE-ES</h1>
+    <nav class="main-nav">
+      <a href="/reportante">Reportante</a>
+      <a href="/decisor">Decisor</a>
+      <a href="/evaluador" class="active">Evaluador</a>
+    </nav>
+  </header>
+  <main class="app-main">
+    <section class="card">
+      <h2>Vista de anotación y discrepancias</h2>
+      <p class="help">Compare la predicción del Brazo C con su anotación de referencia.</p>
+      <div id="lista-anotaciones" class="annotation-list"></div>
+    </section>
+  </main>
+  <footer class="app-footer"><p>MOTIE-ES v1.0.0</p></footer>
+  <script>
+    async function cargarAnotaciones() {
+      const resp = await fetch('/api/annotations');
+      const items = await resp.json();
+      const cont = document.getElementById('lista-anotaciones');
+      cont.innerHTML = '';
+      if (!items.length) {
+        cont.innerHTML = '<p>No hay casos para anotar.</p>';
+        return;
+      }
+      for (const it of items) {
+        const div = document.createElement('div');
+        div.className = 'annotation-card';
+        div.innerHTML = `
+          <p class="incident-text">${it.texto}</p>
+          <p><strong>Predicción Brazo C:</strong> ${it.tipo_predicho_arm_c} | ${it.prioridad_predicha_arm_c} (confianza ${it.confianza?.toFixed(2) ?? '—'})</p>
+          <p><strong>Anotación de referencia:</strong> ${it.anotacion_referencia || '—'}</p>
+          <div class="anotacion-form">
+            <label>Tipo: <input type="text" id="tipo-${it.id}"></label>
+            <label>Prioridad:
+              <select id="prioridad-${it.id}">
+                <option value="">—</option>
+                <option value="alta">alta</option>
+                <option value="media">media</option>
+                <option value="baja">baja</option>
+              </select>
+            </label>
+            <button class="btn-primary" data-id="${it.id}">Guardar anotación</button>
+          </div>
+        `;
+        cont.appendChild(div);
+      }
+      document.querySelectorAll('.anotacion-form button').forEach(b => {
+        b.addEventListener('click', async () => {
+          const id = b.dataset.id;
+          const tipo = document.getElementById(`tipo-${id}`).value;
+          const prioridad = document.getElementById(`prioridad-${id}`).value;
+          await fetch('/api/annotations', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({id, tipo, prioridad, evaluador: 'evaluador_demo'}),
+          });
+          alert('Anotación guardada.');
+        });
+      });
+    }
+    cargarAnotaciones();
+  </script>
+</body>
+</html>

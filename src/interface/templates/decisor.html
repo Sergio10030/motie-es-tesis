@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Decisor | MOTIE-ES</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <header class="app-header">
+    <h1>MOTIE-ES</h1>
+    <nav class="main-nav">
+      <a href="/reportante">Reportante</a>
+      <a href="/decisor" class="active">Decisor</a>
+      <a href="/evaluador">Evaluador</a>
+    </nav>
+  </header>
+  <main class="app-main">
+    <section class="card">
+      <h2>Panel de decisión</h2>
+      <div class="toolbar">
+        <button id="btn-refresh" class="btn-secondary">Actualizar</button>
+        <label class="checkbox">
+          <input type="checkbox" id="solo-derivados"> Mostrar solo casos derivados
+        </label>
+      </div>
+      <div id="lista-incidencias" class="incident-list" role="list"></div>
+    </section>
+  </main>
+  <footer class="app-footer"><p>MOTIE-ES v1.0.0</p></footer>
+  <script>
+    async function cargarIncidencias() {
+      const soloDerivados = document.getElementById('solo-derivados').checked;
+      const url = soloDerivados ? '/api/derived' : '/api/incidents';
+      const resp = await fetch(url);
+      const items = await resp.json();
+      const cont = document.getElementById('lista-incidencias');
+      cont.innerHTML = '';
+      if (!items.length) {
+        cont.innerHTML = '<p>No hay incidencias para mostrar.</p>';
+        return;
+      }
+      items.sort((a, b) => {
+        const orden = {alta: 0, media: 1, baja: 2};
+        return (orden[a.prioridad_predicha] ?? 9) - (orden[b.prioridad_predicha] ?? 9);
+      });
+      for (const inc of items) {
+        const div = document.createElement('div');
+        div.className = 'incident-card';
+        div.setAttribute('role', 'listitem');
+        const conf = inc.confianza != null ? inc.confianza.toFixed(2) : '—';
+        div.innerHTML = `
+          <div class="incident-header">
+            <strong>${inc.tipo_predicho || 'Sin sugerencia'}</strong>
+            <span class="badge prioridad-${inc.prioridad_predicha || 'baja'}">${inc.prioridad_predicha || '—'}</span>
+            <span class="confianza">Confianza: ${conf}</span>
+          </div>
+          <p class="incident-text">${inc.texto_original}</p>
+          <p class="explicacion">${inc.explicacion || ''}</p>
+          <div class="acciones">
+            <button class="btn-confirmar" data-id="${inc.id}">Confirmar</button>
+            <button class="btn-ajustar" data-id="${inc.id}">Ajustar</button>
+            <button class="btn-rechazar" data-id="${inc.id}">Rechazar</button>
+          </div>
+        `;
+        cont.appendChild(div);
+      }
+      document.querySelectorAll('.btn-confirmar').forEach(b => {
+        b.addEventListener('click', () => decidir(b.dataset.id, 'confirmar'));
+      });
+      document.querySelectorAll('.btn-rechazar').forEach(b => {
+        b.addEventListener('click', () => decidir(b.dataset.id, 'rechazar'));
+      });
+      document.querySelectorAll('.btn-ajustar').forEach(b => {
+        b.addEventListener('click', () => {
+          const tipo = prompt('Nuevo tipo:');
+          const prioridad = prompt('Nueva prioridad (alta/media/baja):');
+          if (tipo && prioridad) decidir(b.dataset.id, 'ajustar', tipo, prioridad);
+        });
+      });
+    }
+
+    async function decidir(id, accion, tipo, prioridad) {
+      const payload = {accion};
+      if (tipo) payload.tipo = tipo;
+      if (prioridad) payload.prioridad = prioridad;
+      await fetch(`/api/incidents/${id}/decision`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload),
+      });
+      cargarIncidencias();
+    }
+
+    document.getElementById('btn-refresh').addEventListener('click', cargarIncidencias);
+    document.getElementById('solo-derivados').addEventListener('change', cargarIncidencias);
+    cargarIncidencias();
+  </script>
+</body>
+</html>

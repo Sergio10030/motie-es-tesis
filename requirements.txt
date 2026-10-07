@@ -1,0 +1,37 @@
+# Core
+numpy==1.26.4
+pandas==2.2.2
+scikit-learn==1.5.1
+scipy==1.14.0
+pyyaml==6.0.1
+
+# Deep learning
+torch==2.3.1
+transformers==4.43.3
+datasets==2.20.0
+accelerate==0.33.0
+sentencepiece==0.2.0
+protobuf==4.25.3
+
+# LLM APIs
+openai==1.40.0
+anthropic==0.31.0
+google-generativeai==0.7.2
+
+# Concordancia
+krippendorff==0.7.0
+
+# Interfaz
+flask==3.0.3
+jinja2==3.1.4
+
+# Utilidades
+tqdm==4.66.4
+python-dotenv==1.0.1
+
+# Pruebas
+pytest==8.3.2
+pytest-cov==5.0.0
+
+# Notebooks
+ipykernel==6.29.5

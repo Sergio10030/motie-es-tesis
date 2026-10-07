@@ -1,0 +1,174 @@
+# ============================================================
+# MOTIE-ES: Configuración central del sistema
+# ============================================================
+
+project:
+  name: "MOTIE-ES"
+  version: "1.0.0"
+  description: "Triaje automático de incidencias escolares en español informal"
+  seed: 42
+
+paths:
+  data_raw: "data/raw"
+  data_processed: "data/processed"
+  data_lexicon: "data/lexicon"
+  results_metrics: "results/metrics"
+  results_figures: "results/figures"
+  results_logs: "results/logs"
+  models_cache: "models/cache"
+  checkpoints: "models/checkpoints"
+
+# ------------------------------------------------------------
+# C1: Corpus y partición
+# ------------------------------------------------------------
+corpus:
+  input_format: "csv"  # csv o json
+  text_column: "texto"
+  type_column: "tipo_funcional"
+  priority_column: "prioridad"
+  annotator_columns: ["anotador_1", "anotador_2", "anotador_3"]
+  metadata_columns: ["nivel_educativo", "tipo_institucion", "fecha"]
+  kappa_min_threshold: 0.60
+  test_size: 0.20
+  val_size: 0.10
+  stratify_by: ["tipo_funcional", "prioridad"]
+
+# ------------------------------------------------------------
+# C2: Léxico escolar
+# ------------------------------------------------------------
+lexicon:
+  jerga_file: "data/lexicon/jerga_escolar.json"
+  admin_file: "data/lexicon/vocabulario_administrativo.json"
+  normalize: true
+  remove_duplicates: true
+
+# ------------------------------------------------------------
+# C3: Preprocesamiento
+# ------------------------------------------------------------
+preprocessing:
+  lowercase: true
+  remove_special_chars: true
+  reduce_repeated_chars: true
+  max_repeated: 3
+  standardize_laughter: true
+  normalize_emojis: true
+  emoji_format: "text"  # text o hex
+  compute_register_metadata: true
+
+# ------------------------------------------------------------
+# C4: Brazo A - Línea base clásica
+# ------------------------------------------------------------
+arm_a:
+  tfidf_max_features: 10000
+  tfidf_ngram_range: [1, 2]
+  tfidf_min_df: 1
+  tfidf_max_df: 0.95
+  logistic_max_iter: 3000
+  logistic_solver: "saga"
+  logistic_penalty: "l2"
+  logistic_C: 1.0
+  use_svm: false
+  svm_kernel: "linear"
+  svm_C: 1.0
+  multi_task: true  # entrena clasificadores independientes para tipo y prioridad
+
+# ------------------------------------------------------------
+# C5: Brazo B - Fine-tuning
+# ------------------------------------------------------------
+arm_b:
+  models:
+    - "dccuchile/bert-base-spanish-wwm-uncased"  # BETO
+    - "pysentimiento/robertuito-base-uncased"     # RoBERTuito
+    - "BSC-LT/bertuit-base-cased"                  # BERTuit
+    - "BSC-LT/roberta-base-bne"                    # RoBERTa-BNE
+  default_model: "pysentimiento/robertuito-base-uncased"
+  learning_rate: 2.0e-5
+  batch_size: 16
+  weight_decay: 0.01
+  num_epochs: 6
+  max_length: 512
+  warmup_ratio: 0.1
+  class_weighting: true
+  gradient_clip: 1.0
+  early_stopping_patience: 3
+
+# ------------------------------------------------------------
+# C6: Brazo C - Few-shot jerárquico
+# ------------------------------------------------------------
+arm_c:
+  providers:
+    - name: "openai"
+      model: "gpt-4o"
+      api_key_env: "OPENAI_API_KEY"
+      base_url: "https://api.openai.com/v1"
+    - name: "anthropic"
+      model: "claude-3-5-sonnet-20241022"
+      api_key_env: "ANTHROPIC_API_KEY"
+      base_url: "https://api.anthropic.com/v1"
+    - name: "google"
+      model: "gemini-1.5-pro"
+      api_key_env: "GOOGLE_API_KEY"
+      base_url: "https://generativelanguage.googleapis.com/v1beta"
+    - name: "meta"
+      model: "llama-3.1-70b-instruct"
+      api_key_env: "LLAMA_API_KEY"
+      base_url: "https://api.together.xyz/v1"
+    - name: "deepseek"
+      model: "deepseek-chat"
+      api_key_env: "DEEPSEEK_API_KEY"
+      base_url: "https://api.deepseek.com/v1"
+  default_provider: "openai"
+  k_shot_min: 3
+  k_shot_max: 10
+  default_k: 5
+  temperature: 0.0
+  max_tokens: 100
+  selection_strategy: "register_diversity"  # random o register_diversity
+  max_retries: 3
+  fallback_label: "revision_humana"
+
+# ------------------------------------------------------------
+# C7: Priorización con coste asimétrico
+# ------------------------------------------------------------
+decision:
+  priority_levels: ["alta", "media", "baja"]
+  critical_level: "alta"
+  cost_alpha: 5.0   # FN en clase crítica
+  cost_beta: 1.0    # FP en clase crítica
+  cost_gamma: 2.0   # FN en clase no crítica
+  cost_delta: 1.0   # FP en clase no crítica
+  confidence_threshold: 0.70
+  stage_discrepancy_threshold: 0.30
+  calibration_method: "grid_search"  # grid_search o scipy
+
+# ------------------------------------------------------------
+# C8: Concordancia con criterio humano
+# ------------------------------------------------------------
+validation:
+  kappa_weighted: true
+  kappa_weights: "quadratic"
+  krippendorff_level: "ordinal"
+  scenarios:
+    - "arm_c_only"
+    - "human_only"
+    - "arm_c_plus_human"
+
+# ------------------------------------------------------------
+# C9: Interfaz
+# ------------------------------------------------------------
+interface:
+  host: "0.0.0.0"
+  port: 8000
+  debug: false
+  session_timeout_minutes: 60
+  max_text_length: 5000
+  language: "es"
+
+# ------------------------------------------------------------
+# Logging
+# ------------------------------------------------------------
+logging:
+  level: "INFO"
+  format: "%(asctime)s | %(name)s | %(levelname)s | %(message)s"
+  file: "results/logs/motie_es.log"
+  console: true

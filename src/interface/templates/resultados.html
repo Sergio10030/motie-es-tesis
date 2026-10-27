@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resultados | MOTIE-ES</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header class="app-header">
+    <h1>MOTIE-ES</h1>
+    <nav class="main-nav" aria-label="Navegación principal">
+      <a href="/reportante">Reportante</a>
+      <a href="/decisor">Decisor</a>
+      <a href="/evaluador">Evaluador</a>
+      <a href="/resultados" class="active">Resultados</a>
+    </nav>
+  </header>
+
+  <main class="app-main">
+    <section class="card">
+      <h2>Estado del triaje</h2>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <span class="stat-value" id="kpi-total">—</span>
+          <span class="stat-label">Incidencias registradas</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-value" id="kpi-confianza">—</span>
+          <span class="stat-label">Confianza media</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-value" id="kpi-derivadas">—</span>
+          <span class="stat-label" id="kpi-derivadas-label">Derivadas a revisión</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-value" id="kpi-mejor">—</span>
+          <span class="stat-label">Mejor brazo medido</span>
+        </div>
+      </div>
+      <p class="help" id="aviso-brazo"></p>
+    </section>
+
+    <section class="card">
+      <h2>Desempeño por brazo experimental</h2>
+      <p class="help">F1 macro sobre la tarea de tipo funcional, medido en el conjunto
+        de test por los scripts de <code>experiments/</code>.</p>
+      <div class="chart-container"><canvas id="chart-brazos"></canvas></div>
+      <table class="metrics-table">
+        <caption class="help">Valores leídos de <code>results/metrics/</code>.</caption>
+        <thead>
+          <tr>
+            <th scope="col">Brazo</th>
+            <th scope="col">F1 macro (tipo)</th>
+            <th scope="col">F1 macro (prioridad)</th>
+            <th scope="col">F1 ponderado</th>
+            <th scope="col">Exactitud</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-brazos"></tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <h2>Incidencias por nivel de prioridad</h2>
+      <div class="chart-container"><canvas id="chart-prioridad"></canvas></div>
+    </section>
+
+    <section class="card">
+      <h2>Incidencias por tipo funcional</h2>
+      <div class="chart-container"><canvas id="chart-tipo"></canvas></div>
+    </section>
+  </main>
+
+  <footer class="app-footer"><p>MOTIE-ES v1.0.0 — Datos anonimizados, uso académico.</p></footer>
+
+  <script>
+    const INK = '#1a1a1a';
+    const INK_MUTED = '#5a5a5a';
+    const GRID = '#e6ebf2';
+    const HUE = '#1a4d8f';
+    // Estado: estos colores no distinguen bien en daltonismo rojo-verde, asi que
+    // solo se usan donde la etiqueta de texto acompana siempre al color.
+    const STATUS = { alta: '#b00020', media: '#b36b00', baja: '#0a7d33' };
+
+    // Relleno rayado para valores estimados: distingue sin depender del color.
+    function hatch(color) {
+      const c = document.createElement('canvas');
+      c.width = 8;
+      c.height = 8;
+      const x = c.getContext('2d');
+      x.fillStyle = '#ffffff';
+      x.fillRect(0, 0, 8, 8);
+      x.strokeStyle = color;
+      x.lineWidth = 2.5;
+      x.beginPath();
+      x.moveTo(0, 8);
+      x.lineTo(8, 0);
+      x.moveTo(-2, 2);
+      x.lineTo(2, -2);
+      x.moveTo(6, 10);
+      x.lineTo(10, 6);
+      x.stroke();
+      return x.createPattern(c, 'repeat');
+    }
+
+    // enteros=true para conteos de incidencias: sin pasos decimales.
+    function ejeValor(max, enteros) {
+      return {
+        beginAtZero: true,
+        max: max,
+        grid: { color: GRID },
+        border: { display: false },
+        ticks: enteros
+          ? { color: INK_MUTED, precision: 0, stepSize: 1 }
+          : { color: INK_MUTED }
+      };
+    }
+
+    const ejeCategoria = { grid: { display: false }, ticks: { color: INK } };
+
+    function barras(canvasId, labels, valores, colores, opciones) {
+      return new Chart(document.getElementById(canvasId), {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: valores,
+            backgroundColor: colores,
+            borderColor: '#ffffff',
+            borderWidth: 2,
+            borderRadius: 4,
+            borderSkipped: 'start',
+            barPercentage: 0.7
+          }]
+        },
+        options: Object.assign(
+          { responsive: true, maintainAspectRatio: false },
+          opciones
+        )
+      });
+    }
+
+    function nombreCorto(n) {
+      return n.replace(/\s*\(.*\)/, '');
+    }
+
+    async function cargar() {
+      const resp = await fetch('/api/results');
+      const d = await resp.json();
+
+      document.getElementById('kpi-total').textContent = d.total_incidents;
+      document.getElementById('kpi-confianza').textContent =
+        d.avg_confidence ? d.avg_confidence.toFixed(2) : '—';
+      document.getElementById('kpi-derivadas').textContent = d.derived_count;
+      document.getElementById('kpi-derivadas-label').textContent =
+        'Derivadas a revisión (conf. < ' + d.confidence_threshold + ')';
+      document.getElementById('kpi-mejor').textContent = d.best_arm || 'sin medir';
+
+      // --- Brazos experimentales ---------------------------------------
+      const nombres = Object.keys(d.metrics_by_arm);
+      const f1 = nombres.map(n => d.metrics_by_arm[n].f1_macro);
+      const etiquetas = nombres.map(n =>
+        d.metrics_by_arm[n].estimado ? nombreCorto(n) + ' (estimado)' : nombreCorto(n)
+      );
+      const relleno = nombres.map(n =>
+        d.metrics_by_arm[n].estimado ? hatch(HUE) : HUE
+      );
+
+      barras('chart-brazos', etiquetas, f1, relleno, {
+        indexAxis: 'y',
+        scales: { x: ejeValor(1), y: ejeCategoria },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function (ctx) {
+                const m = d.metrics_by_arm[nombres[ctx.dataIndex]];
+                const base = 'F1 macro ' + m.f1_macro.toFixed(3);
+                return m.nota ? [base, m.nota] : base;
+              }
+            }
+          }
+        }
+      });
+
+      const conNota = nombres.filter(n => d.metrics_by_arm[n].nota);
+      document.getElementById('aviso-brazo').textContent = conNota.length
+        ? conNota.map(nombreCorto).join(', ') + ': ' + d.metrics_by_arm[conNota[0]].nota
+        : '';
+
+      const tbody = document.getElementById('tabla-brazos');
+      tbody.innerHTML = '';
+      nombres.forEach(function (n) {
+        const m = d.metrics_by_arm[n];
+        const tr = document.createElement('tr');
+        tr.innerHTML =
+          '<th scope="row">' + n + (m.estimado ? ' <em>(estimado)</em>' : '') + '</th>' +
+          '<td>' + m.f1_macro.toFixed(3) + '</td>' +
+          '<td>' + m.f1_macro_prioridad.toFixed(3) + '</td>' +
+          '<td>' + m.f1_weighted.toFixed(3) + '</td>' +
+          '<td>' + m.accuracy.toFixed(3) + '</td>';
+        tbody.appendChild(tr);
+      });
+
+      // --- Prioridad ----------------------------------------------------
+      const niveles = ['alta', 'media', 'baja'];
+      barras(
+        'chart-prioridad',
+        niveles,
+        niveles.map(n => d.priority_distribution[n] || 0),
+        niveles.map(n => STATUS[n]),
+        {
+          scales: { x: ejeCategoria, y: ejeValor(undefined, true) },
+          plugins: { legend: { display: false } }
+        }
+      );
+
+      // --- Tipo funcional -----------------------------------------------
+      const tipos = Object.keys(d.type_distribution).sort(
+        (a, b) => d.type_distribution[b] - d.type_distribution[a]
+      );
+      barras(
+        'chart-tipo',
+        tipos.map(t => t.replace(/_/g, ' ')),
+        tipos.map(t => d.type_distribution[t]),
+        HUE,
+        {
+          indexAxis: 'y',
+          scales: { x: ejeValor(undefined, true), y: ejeCategoria },
+          plugins: { legend: { display: false } }
+        }
+      );
+    }
+
+    cargar();
+  </script>
+</body>
+</html>

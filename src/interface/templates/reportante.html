@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reportante | MOTIE-ES</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <header class="app-header">
+    <h1>MOTIE-ES</h1>
+    <nav class="main-nav">
+      <a href="/reportante" class="active">Reportante</a>
+      <a href="/decisor">Decisor</a>
+      <a href="/evaluador">Evaluador</a>
+      <a href="/resultados">Resultados</a>
+    </nav>
+  </header>
+  <main class="app-main">
+    <section class="card">
+      <h2>Reporte de incidencia escolar</h2>
+      <p class="help">Complete el formulario para registrar una incidencia. Todos los campos de contacto son opcionales.</p>
+      <form id="form-reporte">
+        <label for="texto">Descripción de la incidencia *</label>
+        <textarea id="texto" name="texto" required placeholder="Describa el incidente con el mayor detalle posible..."></textarea>
+        <p class="counter"><span id="contador">0</span> / 5000 caracteres</p>
+
+        <label for="nivel_educativo">Nivel educativo</label>
+        <select id="nivel_educativo" name="nivel_educativo">
+          <option value="">— Seleccionar —</option>
+          <option value="primaria">Primaria</option>
+          <option value="secundaria">Secundaria</option>
+          <option value="superior">Superior</option>
+          <option value="otro">Otro</option>
+        </select>
+
+        <label for="tipo_institucion">Tipo de institución</label>
+        <select id="tipo_institucion" name="tipo_institucion">
+          <option value="">— Seleccionar —</option>
+          <option value="publica">Pública</option>
+          <option value="privada">Privada</option>
+          <option value="estatal">Estatal</option>
+          <option value="otro">Otro</option>
+        </select>
+
+        <label for="fecha">Fecha del incidente</label>
+        <input type="date" id="fecha" name="fecha">
+
+        <button type="submit" class="btn-primary">Registrar incidencia</button>
+      </form>
+      <div id="mensaje" style="display: none;"></div>
+    </section>
+  </main>
+  <footer class="app-footer"><p>MOTIE-ES v1.0.0 — Datos anonimizados, uso académico.</p></footer>
+  <script>
+    const textarea = document.getElementById('texto');
+    const contador = document.getElementById('contador');
+    const form = document.getElementById('form-reporte');
+    const msg = document.getElementById('mensaje');
+
+    textarea.addEventListener('input', () => {
+      contador.textContent = textarea.value.length;
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = {
+        texto: document.getElementById('texto').value,
+        nivel_educativo: document.getElementById('nivel_educativo').value,
+        tipo_institucion: document.getElementById('tipo_institucion').value,
+        fecha: document.getElementById('fecha').value,
+      };
+
+      try {
+        const resp = await fetch('/reportante', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(data),
+        });
+        const result = await resp.json();
+        if (resp.ok) {
+          msg.innerHTML = `<p style="color: green; font-weight: bold;">✓ ${result.mensaje}</p><p>ID de incidencia: <code>${result.id}</code></p>`;
+          msg.style.display = 'block';
+          form.reset();
+          contador.textContent = '0';
+          setTimeout(() => { form.style.display = 'none'; }, 2000);
+        } else {
+          msg.innerHTML = `<p style="color: red;">✗ ${result.error}</p>`;
+          msg.style.display = 'block';
+        }
+      } catch (err) {
+        msg.innerHTML = `<p style="color: red;">Error al registrar: ${err.message}</p>`;
+        msg.style.display = 'block';
+      }
+    });
+
+    // Cargar fecha de hoy por defecto
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('fecha').valueAsDate = new Date();
+  </script>
+</body>
+</html>

@@ -1,0 +1,213 @@
+/* MOTIE-ES: hoja de estilo accesible y responsiva */
+:root {
+  --color-primary: #1a4d8f;
+  --color-primary-dark: #0f3260;
+  --color-bg: #f7f9fc;
+  --color-card: #ffffff;
+  --color-text: #1a1a1a;
+  --color-muted: #5a5a5a;
+  --color-alta: #b00020;
+  --color-media: #b36b00;
+  --color-baja: #0a7d33;
+  --color-border: #d0d7e2;
+  --radius: 8px;
+  --font-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font-base);
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.55;
+  font-size: 16px;
+}
+
+.app-header {
+  background: var(--color-primary);
+  color: #fff;
+  padding: 1rem 1.5rem;
+}
+
+.app-header h1 { margin: 0; font-size: 1.6rem; }
+.subtitle { margin: 0.2rem 0 0.8rem; font-size: 0.95rem; opacity: 0.9; }
+
+.main-nav a {
+  color: #fff;
+  text-decoration: none;
+  margin-right: 1rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius);
+  font-weight: 500;
+}
+.main-nav a:hover, .main-nav a:focus, .main-nav a.active {
+  background: rgba(255,255,255,0.18);
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.app-main { max-width: 960px; margin: 1.5rem auto; padding: 0 1rem; }
+
+.card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.card h2 { margin-top: 0; color: var(--color-primary-dark); }
+
+.help { color: var(--color-muted); font-size: 0.95rem; }
+
+form label { display: block; margin-top: 1rem; font-weight: 600; }
+form input, form select, form textarea {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-family: inherit;
+  font-size: 1rem;
+  margin-top: 0.3rem;
+}
+form textarea { resize: vertical; min-height: 120px; }
+form input:focus, form select:focus, form textarea:focus {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 1px;
+  border-color: var(--color-primary);
+}
+
+.counter { text-align: right; color: var(--color-muted); font-size: 0.85rem; }
+
+.btn-primary, .btn-secondary, .btn-confirmar, .btn-ajustar, .btn-rechazar {
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.7rem 1.2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 1rem;
+}
+.btn-primary { background: var(--color-primary); color: #fff; }
+.btn-primary:hover, .btn-primary:focus { background: var(--color-primary-dark); outline: 3px solid var(--color-primary-dark); outline-offset: 2px; }
+.btn-secondary { background: #e3e8f0; color: var(--color-text); margin-top: 0; }
+.btn-confirmar { background: var(--color-baja); color: #fff; }
+.btn-ajustar { background: var(--color-media); color: #fff; }
+.btn-rechazar { background: var(--color-alta); color: #fff; }
+
+#mensaje { margin-top: 1rem; font-weight: 600; }
+
+.toolbar { display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; }
+.checkbox { display: flex; align-items: center; gap: 0.4rem; font-weight: 500; }
+
+.incident-list, .annotation-list { display: flex; flex-direction: column; gap: 1rem; }
+
+.incident-card, .annotation-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  background: #fff;
+}
+
+.incident-header { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
+
+.badge {
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.prioridad-alta { background: var(--color-alta); }
+.prioridad-media { background: var(--color-media); }
+.prioridad-baja { background: var(--color-baja); }
+
+.confianza { color: var(--color-muted); font-size: 0.9rem; }
+
+.incident-text { margin: 0.6rem 0; }
+.explicacion { color: var(--color-muted); font-size: 0.9rem; font-style: italic; }
+
+.acciones { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.acciones button { margin-top: 0.5rem; padding: 0.5rem 0.9rem; font-size: 0.95rem; }
+
+.anotacion-form { display: flex; gap: 0.8rem; align-items: flex-end; flex-wrap: wrap; margin-top: 0.8rem; }
+.anotacion-form label { display: flex; flex-direction: column; font-size: 0.9rem; }
+.anotacion-form input, .anotacion-form select { min-width: 140px; }
+
+.app-footer {
+  text-align: center;
+  color: var(--color-muted);
+  padding: 1rem;
+  font-size: 0.85rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.stat-box {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  color: #fff;
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.stat-value {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  display: block;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.chart-container {
+  position: relative;
+  height: 400px;
+  margin: 1rem 0;
+}
+
+.metrics-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.metrics-table thead {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.metrics-table th, .metrics-table td {
+  padding: 0.8rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.metrics-table tbody tr:hover {
+  background: var(--color-bg);
+}
+
+.metrics-table tbody tr:nth-child(even) {
+  background: #fafbfc;
+}
+
+@media (max-width: 600px) {
+  .app-header h1 { font-size: 1.3rem; }
+  .main-nav a { display: inline-block; margin-bottom: 0.3rem; }
+  .card { padding: 1rem; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .chart-container { height: 300px; }
+}

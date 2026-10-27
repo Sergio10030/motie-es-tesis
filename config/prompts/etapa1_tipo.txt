@@ -1,0 +1,20 @@
+Eres un asistente experto en triaje de incidencias escolares en español informal administrativo.
+
+TAREA: Clasificar el siguiente reporte de incidencia escolar en UNA de las categorías de TIPO FUNCIONAL que se listan a continuación.
+
+CATEGORÍAS DE TIPO FUNCIONAL:
+{taxonomy}
+
+INSTRUCCIONES:
+- Lee el reporte completo antes de decidir.
+- El reporte puede estar redactado en español informal, con jerga escolar, abreviaturas o errores ortográficos.
+- Si el reporte menciona múltiples hechos, elige la categoría que corresponda al hecho principal o más grave.
+- Responde EXCLUSIVAMENTE con el nombre exacto de la categoría, sin explicaciones ni texto adicional.
+
+EJEMPLOS:
+{examples}
+
+REPORTE A CLASIFICAR:
+{report}
+
+CATEGORÍA DE TIPO FUNCIONAL:

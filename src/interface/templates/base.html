@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MOTIE-ES | Triaje de Incidencias Escolares</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <header class="app-header">
+    <h1>MOTIE-ES</h1>
+    <p class="subtitle">Triaje automático de incidencias escolares en español informal</p>
+    <nav class="main-nav" aria-label="Navegación principal">
+      <a href="/reportante">Reportante</a>
+      <a href="/decisor">Decisor</a>
+      <a href="/evaluador">Evaluador</a>
+      <a href="/resultados">Resultados</a>
+    </nav>
+  </header>
+  <main class="app-main">
+    <section class="card">
+      <h2>Bienvenido al sistema MOTIE-ES</h2>
+      <p>Seleccione su rol en la navegación superior para comenzar.</p>
+      <ul>
+        <li><strong>Reportante:</strong> registre una incidencia escolar.</li>
+        <li><strong>Decisor:</strong> revise las sugerencias de triaje y confirme o ajuste.</li>
+        <li><strong>Evaluador:</strong> anote casos de referencia y revise discrepancias.</li>
+      </ul>
+    </section>
+  </main>
+  <footer class="app-footer">
+    <p>MOTIE-ES v1.0.0 — Datos anonimizados, uso académico.</p>
+  </footer>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

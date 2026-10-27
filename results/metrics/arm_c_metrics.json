@@ -1,0 +1,99 @@
+{
+  "f1_macro": 0.0,
+  "f1_weighted": 0.0,
+  "f2_macro": 0.0,
+  "accuracy": 0.0,
+  "recall_por_clase": {
+    "queja_general": 0.0,
+    "sugerencia_general": 0.0
+  },
+  "classification_report": {
+    "queja_general": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 1468.0
+    },
+    "sugerencia_general": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 176.0
+    },
+    "micro avg": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 1644.0
+    },
+    "macro avg": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 1644.0
+    },
+    "weighted avg": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 1644.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      0,
+      0
+    ],
+    [
+      0,
+      0
+    ]
+  ],
+  "f1_macro_prioridad": 0.45849802371541504,
+  "f1_weighted_prioridad": 0.7764346095034765,
+  "f2_macro_prioridad": 0.4825291181363293,
+  "accuracy_prioridad": 0.8467153284671532,
+  "recall_por_clase_prioridad": {
+    "baja": 0.0,
+    "media": 1.0
+  },
+  "classification_report_prioridad": {
+    "baja": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 252.0
+    },
+    "media": {
+      "precision": 0.8467153284671532,
+      "recall": 1.0,
+      "f1-score": 0.9169960474308301,
+      "support": 1392.0
+    },
+    "accuracy": 0.8467153284671532,
+    "macro avg": {
+      "precision": 0.4233576642335766,
+      "recall": 0.5,
+      "f1-score": 0.45849802371541504,
+      "support": 1644.0
+    },
+    "weighted avg": {
+      "precision": 0.7169268474612392,
+      "recall": 0.8467153284671532,
+      "f1-score": 0.7764346095034765,
+      "support": 1644.0
+    }
+  },
+  "confusion_matrix_prioridad": [
+    [
+      0,
+      252
+    ],
+    [
+      0,
+      1392
+    ]
+  ],
+  "execution_mode": "simulado",
+  "invalid_responses": 0
+}

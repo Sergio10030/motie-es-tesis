@@ -1,0 +1,92 @@
+{
+  "f1_macro": 0.6159670216420474,
+  "f1_weighted": 0.8786712369642459,
+  "f2_macro": 0.5895820036992921,
+  "accuracy": 0.906934306569343,
+  "recall_por_clase": {
+    "queja_general": 0.9952316076294278,
+    "sugerencia_general": 0.17045454545454544
+  },
+  "classification_report": {
+    "queja_general": {
+      "precision": 0.9091474797759801,
+      "recall": 0.9952316076294278,
+      "f1-score": 0.9502439024390243,
+      "support": 1468.0
+    },
+    "sugerencia_general": {
+      "precision": 0.8108108108108109,
+      "recall": 0.17045454545454544,
+      "f1-score": 0.28169014084507044,
+      "support": 176.0
+    },
+    "accuracy": 0.906934306569343,
+    "macro avg": {
+      "precision": 0.8599791452933955,
+      "recall": 0.5828430765419866,
+      "f1-score": 0.6159670216420474,
+      "support": 1644.0
+    },
+    "weighted avg": {
+      "precision": 0.8986199531714365,
+      "recall": 0.906934306569343,
+      "f1-score": 0.8786712369642459,
+      "support": 1644.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      1461,
+      7
+    ],
+    [
+      146,
+      30
+    ]
+  ],
+  "f1_macro_prioridad": 0.6783670541435023,
+  "f1_weighted_prioridad": 0.8563570481564753,
+  "f2_macro_prioridad": 0.645281931476872,
+  "accuracy_prioridad": 0.8832116788321168,
+  "recall_por_clase_prioridad": {
+    "baja": 0.2777777777777778,
+    "media": 0.992816091954023
+  },
+  "classification_report_prioridad": {
+    "baja": {
+      "precision": 0.875,
+      "recall": 0.2777777777777778,
+      "f1-score": 0.42168674698795183,
+      "support": 252.0
+    },
+    "media": {
+      "precision": 0.8836317135549873,
+      "recall": 0.992816091954023,
+      "f1-score": 0.9350473612990527,
+      "support": 1392.0
+    },
+    "accuracy": 0.8832116788321168,
+    "macro avg": {
+      "precision": 0.8793158567774937,
+      "recall": 0.6352969348659003,
+      "f1-score": 0.6783670541435023,
+      "support": 1644.0
+    },
+    "weighted avg": {
+      "precision": 0.8823086041779454,
+      "recall": 0.8832116788321168,
+      "f1-score": 0.8563570481564753,
+      "support": 1644.0
+    }
+  },
+  "confusion_matrix_prioridad": [
+    [
+      70,
+      182
+    ],
+    [
+      10,
+      1382
+    ]
+  ]
+}
